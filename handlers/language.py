@@ -18,8 +18,11 @@ def register(dp):
     async def set_language_cb(cb: types.CallbackQuery):
         lang_code = cb.data.split("_")[-1]
         set_lang(cb.from_user.id, lang_code)
+        # Перечитываем пользователя после обновления языка
+        user = get_user(cb.from_user.id)
+        updated_lang = user.get('lang', 'ru')
         await cb.message.edit_text(
-            "Язык изменён!" if lang_code == "ru" else "Language updated!",
+            "Язык изменён!" if updated_lang == "ru" else "Language updated!",
             reply_markup=get_main_menu(cb.from_user.id)
         )
         await cb.answer()
