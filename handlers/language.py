@@ -16,13 +16,19 @@ def register(dp):
 
     @dp.callback_query_handler(lambda cb: cb.data.startswith("set_lang_"))
     async def set_language_cb(cb: types.CallbackQuery):
+        user_id = cb.from_user.id
         lang_code = cb.data.split("_")[-1]
-        set_lang(cb.from_user.id, lang_code)
+        
+        # Обновляем язык
+        set_lang(user_id, lang_code)
+        
         # Перечитываем пользователя после обновления языка
-        user = get_user(cb.from_user.id)
+        user = get_user(user_id)
         updated_lang = user.get('lang', 'ru')
+        
+        # Отправляем подтверждение на выбранном языке с обновленным меню
         await cb.message.edit_text(
-            "Язык изменён!" if updated_lang == "ru" else "Language updated!",
-            reply_markup=get_main_menu(cb.from_user.id)
+            L("language_changed", updated_lang),
+            reply_markup=get_main_menu(user_id)
         )
         await cb.answer()
